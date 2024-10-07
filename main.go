@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"time"
@@ -15,21 +13,27 @@ import (
 	"github.com/mateothegreat/go-multilog/multilog"
 )
 
-var s *discordgo.Session
-var cache = messages.NewCache()
+var (
+	s       *discordgo.Session
+	cache   = messages.NewCache()
+	token   string
+	channel string
+)
 
 func init() {
 	godotenv.Load()
 
-	var token string
 	var err error
 
 	flag.StringVar(&token, "token", os.Getenv("DISCORD_TOKEN"), "Discord bot token")
+	flag.StringVar(&channel, "channel", os.Getenv("DISCORD_CHANNEL_ID"), "Discord channel ID")
 	flag.Parse()
 
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
-		log.Fatalf("Invalid bot parameters: %v", err)
+		multilog.Fatal("main", "error creating discord session", map[string]interface{}{
+			"error": err,
+		})
 	}
 }
 
@@ -51,14 +55,8 @@ func main() {
 			})
 			return
 		}
-		res, _ := json.MarshalIndent(message, "", "  ")
-		log.Printf("message deleted: %s", res)
-		multilog.Info("main", "message deleted", map[string]interface{}{
-			"channel_id": m.ChannelID,
-			"message_id": m.ID,
-		})
 
-		_, err = s.ChannelMessageSendComplex("1258999696387477575", &discordgo.MessageSend{
+		_, err = s.ChannelMessageSendComplex(channel, &discordgo.MessageSend{
 			Content: "A message was deleted.",
 			Embeds: []*discordgo.MessageEmbed{
 				{

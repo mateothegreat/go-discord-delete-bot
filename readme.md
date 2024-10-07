@@ -18,6 +18,7 @@ Create a file called `.env` and set the `DISCORD_TOKEN` environment variable.
 
 ```sh
 DISCORD_TOKEN=<your token here>
+DISCORD_CHANNEL_ID=<your channel id here>
 ```
 
 Then run the bot:
@@ -29,5 +30,5 @@ go-discord-delete-bot
 ### Without a `.env` file
 
 ```sh
-go-discord-delete-bot --token <your token here>
+go-discord-delete-bot --token <your token here> --channel <your channel id here>
 ```
